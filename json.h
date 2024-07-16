@@ -2,21 +2,17 @@
 
 #include <json/reader.h>
 #include <sstream>
+#include <type_traits>
 
 namespace Multix
 {
-
-// TODO:
-// we dont need all these 4 functions to exist!
-// only the ones neccessary.
-// but idk how to implement that :(
-template<typename T>
-concept JSONParsable = requires(T& t)
+class Jsonable
 {
-	JSONHandle(t, "key", "value");
-	JSONHandle(t, "key", 12);
-	JSONHandle(t, "key", false);
-	JSONHandle(t, "key", 12.5f);
+public:
+	virtual void JSONHandleStr(const std::string& key, const std::string& value) {}
+	virtual void JSONHandleBool(const std::string& key, bool value) {}
+	virtual void JSONHandleInt(const std::string& key, int value) {}
+	virtual void JSONHandleFloat(const std::string& key, float value) {}
 };
 
 enum class JSONStatus
@@ -26,11 +22,15 @@ enum class JSONStatus
 	Bad
 };
 
-template<JSONParsable T>
+template<typename T>
+	//requires(std::is_base_of_v<Jsonable, T>)
 class JSONParser
 {
 public:
-	JSONParser() = default;
+	JSONParser()
+	{
+		static_assert(std::is_base_of_v<Jsonable, T>, "type must inherit from Jsonable");
+	}
 	~JSONParser() = default;
 
 	JSONParser& operator<<(const std::string& jsonStr)
@@ -71,13 +71,13 @@ private:
 	void handle(const std::string& key, Json::Value& jVal)
 	{
 		if (jVal.isBool())
-			JSONHandle(m_Result, key, jVal.asBool());
+			m_Result.JSONHandleBool(key, jVal.asBool());
 		else if (jVal.isString())
-			JSONHandle(m_Result, key, jVal.asString());
+			m_Result.JSONHandleStr(key, jVal.asString());
 		else if (jVal.isInt())
-			JSONHandle(m_Result, key, jVal.asInt());
+			m_Result.JSONHandleInt(key, jVal.asInt());
 		else if (jVal.isDouble())
-			JSONHandle(m_Result, key, jVal.asFloat());
+			m_Result.JSONHandleFloat(key, jVal.asFloat());
 	}
 private:
 	T m_Result;

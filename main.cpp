@@ -3,11 +3,26 @@
 #include "json.h"
 
 
-struct Token
+struct Token : Multix::Jsonable
 {
 	bool isValid = false;
 	unsigned int expiresAt = 0;
+
+	void JSONHandleBool(const std::string& key, bool value) override
+	{
+		std::cout << std::boolalpha;
+		if (key == "is_valid")
+			isValid = value;
+	}
+
+	void JSONHandleInt(const std::string& key, int value) override
+	{
+		if (key == "expires_at")
+			expiresAt = value;
+	}
 };
+
+struct Shit {};
 
 std::ostream& operator<<(std::ostream& os, Token& token)
 {
@@ -15,23 +30,6 @@ std::ostream& operator<<(std::ostream& os, Token& token)
 	os << "isValid: " << token.isValid << ", expiresAt: " << token.expiresAt;
 	return os;
 }
-
-void JSONHandle(Token& token, const std::string& key, const std::string& value) {}
-
-void JSONHandle(Token& token, const std::string& key, bool value)
-{
-	std::cout << std::boolalpha;
-	if (key == "is_valid")
-		token.isValid = value;
-}
-
-void JSONHandle(Token& token, const std::string& key, int value)
-{
-	if (key == "expires_at")
-		token.expiresAt = value;
-}
-
-void JSONHandle(Token& token, const std::string& key, float value) {}
 
 int main()
 {
