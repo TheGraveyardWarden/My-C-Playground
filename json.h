@@ -23,7 +23,6 @@ enum class JSONStatus
 };
 
 template<typename T>
-	//requires(std::is_base_of_v<Jsonable, T>)
 class JSONParser
 {
 public:

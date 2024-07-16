@@ -22,8 +22,6 @@ struct Token : Multix::Jsonable
 	}
 };
 
-struct Shit {};
-
 std::ostream& operator<<(std::ostream& os, Token& token)
 {
 	os << std::boolalpha;
