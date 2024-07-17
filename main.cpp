@@ -1,65 +1,75 @@
 #include <iostream>
-#include "httpclient.h"
+#include "crypto.h"
 #include "json.h"
+#include "httpclient.h"
 
+using namespace Multix;
 
-struct Token : Multix::Jsonable
+struct Token : public Jsonable
 {
 	bool isValid = false;
-	unsigned int expiresAt = 0;
+	int expiresAt = 0;
 
-	void JSONHandleBool(const std::string& key, bool value) override
+	Token() = default;
+
+	Token(Token&& other) noexcept
 	{
-		std::cout << std::boolalpha;
+		std::cout << "Token Moved!" << std::endl;
+		isValid = other.isValid;
+		expiresAt = other.expiresAt;
+
+		other.isValid = false;
+		other.expiresAt = 0;
+	}
+
+	void JSONHandleBool(const std::string& key, bool value)
+	{
 		if (key == "is_valid")
 			isValid = value;
 	}
 
-	void JSONHandleInt(const std::string& key, int value) override
+	void JSONHandleInt(const std::string& key, int value)
 	{
 		if (key == "expires_at")
 			expiresAt = value;
 	}
 };
 
-std::ostream& operator<<(std::ostream& os, Token& token)
-{
-	os << std::boolalpha;
-	os << "isValid: " << token.isValid << ", expiresAt: " << token.expiresAt;
-	return os;
-}
-
 int main()
 {
-	Multix::HttpClient cli;
-	Multix::HttpStatus status;
+	HttpClient cli;
+	HttpStatus hstatus;
+	JSONParser<Token> jparser;
+	std::shared_ptr<Crypto> crypt = Crypto::Create(CryptoAlgo::XOR, "MY KEY");
 
-	if ((status = cli.Get("http://localhost:9000/validtoken")) != Multix::HttpStatus::OK)
+	hstatus = cli.Get("http://localhost:9000/validtoken");
+	if (hstatus != HttpStatus::OK)
 	{
-		std::cout << "req failed!" << std::endl;
+		std::cout << "req failed" << std::endl;
+		return 1;
+	}
+	
+	jparser << cli.Response().content;
+	if (jparser.Status() != JSONStatus::OK)
+	{
+		std::cout << "parser failed" << std::endl;
 		return 1;
 	}
 
-	Multix::JSONParser<Token> parser;
-	parser << cli.Response().content;
-
-	if (parser.Status() != Multix::JSONStatus::OK) goto end;
-
-	std::cout << parser.Result() << std::endl;
-
-	if ((status = cli.Get("http://localhost:9000/validctoken")) != Multix::HttpStatus::OK)
+	Token token = std::move(jparser.Result());
+	if (!token.isValid)
 	{
-		std::cout << "req failed!" << std::endl;
+		std::cout << "Token is not Valid" << std::endl;
 		return 1;
+	} else {
+		std::cout << "Token is Valid" << std::endl;
 	}
 
-	parser << cli.Response().content;
-	std::cout << parser.Result() << std::endl;
+	std::string enced = crypt->Enc(cli.Response().content);
+	std::cout << enced << std::endl;
+
+	std::string deced = crypt->Dec(enced);
+	std::cout << deced << std::endl;
 
 	return 0;
-
-end:
-	std::cout << "something went wrong!" << std::endl;
-	std::cout << parser.Errs() << std::endl;
-	return 1;
 }

@@ -58,6 +58,8 @@ public:
 	}
 
 	inline const HttpResponse& Response() const { return m_Response; }
+	inline HttpResponse& Response() { return m_Response; }
+
 	inline HttpStatus Status() const { return m_Status; }
 private:
 	static size_t cb(char* data, size_t size, size_t nmemb, void* clientp)
