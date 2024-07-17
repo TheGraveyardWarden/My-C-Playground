@@ -17,7 +17,7 @@ public:
 	virtual std::string Enc(const std::string& data) = 0;
 	virtual std::string Dec(const std::string& data) = 0;
 
-	static std::shared_ptr<Crypto> Create(CryptoAlgo algo, const std::string& key);
+	static std::unique_ptr<Crypto> Create(CryptoAlgo algo, const std::string& key);
 };
 
 class CryptoXOR : public Crypto
@@ -47,12 +47,12 @@ private:
 	std::string m_Key;
 };
 
-std::shared_ptr<Crypto> Crypto::Create(CryptoAlgo algo, const std::string& key)
+std::unique_ptr<Crypto> Crypto::Create(CryptoAlgo algo, const std::string& key)
 {
 	switch(algo)
 	{
 		case CryptoAlgo::XOR:
-			return std::make_shared<CryptoXOR>(key);
+			return std::make_unique<CryptoXOR>(key);
 			break;
 		default:
 			std::cout << "Specified Algo is Not Supported!" << std::endl;

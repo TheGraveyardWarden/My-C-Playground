@@ -40,7 +40,7 @@ int main()
 	HttpClient cli;
 	HttpStatus hstatus;
 	JSONParser<Token> jparser;
-	std::shared_ptr<Crypto> crypt = Crypto::Create(CryptoAlgo::XOR, "MY KEY");
+	std::unique_ptr<Crypto> crypt = Crypto::Create(CryptoAlgo::XOR, "MY KEY");
 
 	hstatus = cli.Get("http://localhost:9000/validtoken");
 	if (hstatus != HttpStatus::OK)
