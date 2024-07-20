@@ -20,7 +20,7 @@ struct Token : public Jsonable
 		other.expiresAt = 0;
 	}
 
-	Token& operator=(Token&& other)
+	Token& operator=(Token&& other) noexcept
 	{
 		isValid = other.isValid;
 		expiresAt = other.expiresAt;
@@ -46,5 +46,11 @@ struct Token : public Jsonable
 
 int main()
 {
+	File file("./shit");
+	Token token;
+	file.ReadJson(token);
+	std::cout << token.isValid << ", " << token.expiresAt << std::endl;
+	std::cout << (int)file.Algo() << std::endl;
+	std::cout << file.Filepath() << std::endl;
 	return 0;
 }

@@ -17,6 +17,8 @@ public:
 	virtual std::string Enc(const std::string& data) = 0;
 	virtual std::string Dec(const std::string& data) = 0;
 
+	virtual CryptoAlgo Algo() const { return CryptoAlgo::None; }
+
 	static std::unique_ptr<Crypto> Create(CryptoAlgo algo, const std::string& key);
 };
 
@@ -43,6 +45,8 @@ public:
 	{
 		return Enc(data);
 	}
+
+	CryptoAlgo Algo() const override { return CryptoAlgo::XOR; }
 private:
 	std::string m_Key;
 };
