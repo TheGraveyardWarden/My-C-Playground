@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MULTIX_JSON_H
+#define MULTIX_JSON_H
 
 #include <json/reader.h>
 #include <sstream>
@@ -84,3 +85,5 @@ private:
 	JSONStatus m_Status;
 };
 }
+
+#endif // MULTIX_JSON_H

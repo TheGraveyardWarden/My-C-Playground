@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MULTIX_FILE_H
+#define MULTIX_FILE_H
 
 #include <iostream>
 #include <type_traits>
@@ -94,3 +95,5 @@ FileStatus File::ReadJson(T& t)
 	return FileStatus::OK;
 }
 }
+
+#endif // MULTIX_FILE_H

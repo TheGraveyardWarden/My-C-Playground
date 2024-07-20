@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MULTIX_HTTPCLIENT_H
+#define MULTIX_HTTPCLIENT_H
 
 #include <curl/curl.h>
 
@@ -94,3 +95,5 @@ private:
 	HttpStatus m_Status;
 };
 }
+
+#endif // MULTIX_HTTPCLIENT_H

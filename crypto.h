@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MULTIX_CRYPTO_H
+#define MULTIX_CRYPTO_H
 
 #include <sstream>
 #include <memory>
@@ -65,3 +66,5 @@ std::unique_ptr<Crypto> Crypto::Create(CryptoAlgo algo, const std::string& key)
 }
 
 }
+
+#endif // MULTIX_CRYPTO_H
